@@ -3,6 +3,7 @@ import Card from "../../components/card/Card";
 import {BiLogIn} from "react-icons/bi";
 import {useState} from "react";
 import {Link} from "react-router-dom";
+import PasswordInput from "../../components/passwordInput/PasswordInput";
 
 const Login = () => {
     const [email, setEmail] = useState("")
@@ -36,12 +37,20 @@ const Login = () => {
                                onChange={handleInputChange}
                         />
 
-                        <input type={"password"}
-                               value={password}
-                               placeholder={"Password"}
-                               required={true}
-                               onChange={handleInputChange}
-                        />
+                        {/*<input type={"password"}*/}
+                        {/*       value={password}*/}
+                        {/*       placeholder={"Password"}*/}
+                        {/*       required={true}*/}
+                        {/*       onChange={handleInputChange}*/}
+                        {/*/>*/}
+
+                        <PasswordInput
+                            placeholder={'Password'}
+                            name={'password'}
+                            value={password}
+                            onChange={handleInputChange()}
+
+                        ></PasswordInput>
 
                         <button type={"submit"} className='--btn --btn-primary --btn-block'>Login</button>
 
