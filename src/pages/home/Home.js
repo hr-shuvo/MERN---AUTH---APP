@@ -7,7 +7,6 @@ const Home = () => {
 
     return (
         <div>
-            <Header></Header>
             <section className='container hero'>
                 <div className='hero-text'>
                     <h2>Ultimate MERN Stack Authentication System</h2>
@@ -25,7 +24,6 @@ const Home = () => {
                 </div>
 
             </section>
-            <Footer></Footer>
         </div>
     );
 
