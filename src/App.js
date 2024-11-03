@@ -7,6 +7,7 @@ import Forgot from "./pages/auth/Forgot";
 import Reset from "./pages/auth/Reset";
 import LoginWithCode from "./pages/auth/LoginWithCode";
 import Profile from "./pages/profile/Profile";
+import Verify from "./pages/auth/Verify";
 
 
 function App() {
@@ -37,8 +38,12 @@ function App() {
                     }/>
 
                     <Route path='/loginWithCode/:email' element={
+                        <LoginWithCode/>
+                    }/>
+
+                    <Route path='/verify/:verificationToken' element={
                         <Layout>
-                            <LoginWithCode/>
+                            <Verify/>
                         </Layout>
                     }/>
 
