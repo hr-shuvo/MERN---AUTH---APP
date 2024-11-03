@@ -1,11 +1,13 @@
 import './UserList.scss'
 import PageMenu from "../../components/pageMenu/PageMenu";
+import UserStats from "../../components/userStats/UserStats";
 
 const UserList = () => {
   return (
       <section>
         <div className='container'>
-            <PageMenu></PageMenu>
+            <PageMenu />
+            <UserStats />
         </div>
       </section>
   )
