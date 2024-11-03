@@ -37,13 +37,6 @@ const Login = () => {
                                onChange={handleInputChange}
                         />
 
-                        {/*<input type={"password"}*/}
-                        {/*       value={password}*/}
-                        {/*       placeholder={"Password"}*/}
-                        {/*       required={true}*/}
-                        {/*       onChange={handleInputChange}*/}
-                        {/*/>*/}
-
                         <PasswordInput
                             placeholder={'Password'}
                             name={'password'}
