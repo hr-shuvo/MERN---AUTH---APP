@@ -1,4 +1,3 @@
-import {FaUserCircle} from "react-icons/fa";
 import {Link, NavLink} from "react-router-dom";
 
 const PageMenu = () => {

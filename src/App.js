@@ -9,6 +9,7 @@ import LoginWithCode from "./pages/auth/LoginWithCode";
 import Profile from "./pages/profile/Profile";
 import Verify from "./pages/auth/Verify";
 import ChangePassword from "./pages/changePassword/ChangePassword";
+import UserList from "./pages/userList/UserList";
 
 
 function App() {
@@ -58,6 +59,11 @@ function App() {
                     <Route path='/profile' element={
                         <Layout>
                             <Profile/>
+                        </Layout>
+                    }/>
+                    <Route path='/users' element={
+                        <Layout>
+                            <UserList/>
                         </Layout>
                     }/>
 
