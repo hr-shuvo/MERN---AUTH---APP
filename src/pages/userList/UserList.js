@@ -3,6 +3,7 @@ import PageMenu from "../../components/pageMenu/PageMenu";
 import UserStats from "../../components/userStats/UserStats";
 import Search from "../../components/search/Search";
 import {FaTrashAlt} from "react-icons/fa";
+import ChangeRole from "../../components/changeRole/ChangeRole";
 
 const UserList = () => {
     return (<section>
@@ -42,7 +43,7 @@ const UserList = () => {
                             <td>suhvo@gmail.com</td>
                             <td>Admin</td>
                             <td>
-                                changeRole
+                                <ChangeRole></ChangeRole>
                             </td>
                             <td>
                             <span>
