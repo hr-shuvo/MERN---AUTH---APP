@@ -6,6 +6,7 @@ import Register from "./pages/auth/Register";
 import Forgot from "./pages/auth/Forgot";
 import Reset from "./pages/auth/Reset";
 import LoginWithCode from "./pages/auth/LoginWithCode";
+import Profile from "./pages/profile/Profile";
 
 
 function App() {
@@ -36,8 +37,18 @@ function App() {
                     }/>
 
                     <Route path='/loginWithCode/:email' element={
-                        <LoginWithCode/>
+                        <Layout>
+                            <LoginWithCode/>
+                        </Layout>
                     }/>
+
+
+                    <Route path='/profile' element={
+                        <Layout>
+                            <Profile/>
+                        </Layout>
+                    }/>
+
 
                 </Routes>
             </BrowserRouter>
