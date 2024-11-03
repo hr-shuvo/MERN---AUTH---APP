@@ -1,4 +1,4 @@
-require("dotenv").config({path:'.env.example'})
+require("dotenv").config({path: '.env.example'})
 
 const express = require("express")
 const mongoose = require("mongoose")
@@ -7,6 +7,18 @@ const bodyParser = require("body-parser")
 const cookieParser = require("cookie-parser")
 
 const app = express()
+
+// Middleware
+app.use(express.json())
+app.use(express.urlencoded({extended: false}))
+app.use(cookieParser())
+app.use(bodyParser.json())
+app.use(
+    cors({
+        origin:['http://localhost:3000', 'https://auth-app-mern.vercel.app'],
+        credentials: true
+    })
+)
 
 
 app.get("/", (req, res) => {
