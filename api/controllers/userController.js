@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs')
 const {generateToken} = require("../utils");
 const parser = require('ua-parser-js');
 const {async} = require("nodemon");
-const {response} = require("express");
+const jwt = require("jsonwebtoken");
 
 // register user
 const registerUser = asyncHandler(async (req, res) => {
@@ -203,6 +203,23 @@ const getUsers = asyncHandler(async (req, res) => {
     res.status(200).json(users);
 })
 
+// get login Status
+const loginStatus = asyncHandler(async(req, res) =>{
+    const token = req.cookies.token;
+    if(!token){
+        return res.json(false)
+    }
+
+    // Verify token
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+
+    if(verified){
+        return res.json(true)
+    }
+
+    return res.json(false)
+})
+
 module.exports = {
     registerUser,
     loginUser,
@@ -210,5 +227,6 @@ module.exports = {
     getUser,
     updateUser,
     deleteUser,
-    getUsers
+    getUsers,
+    loginStatus
 }
