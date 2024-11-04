@@ -1,6 +1,15 @@
 const express = require("express")
 const {
-    registerUser, loginUser, logoutUser, getUser, updateUser, deleteUser, getUsers, loginStatus, upgradeUser
+    registerUser,
+    loginUser,
+    logoutUser,
+    getUser,
+    updateUser,
+    deleteUser,
+    getUsers,
+    loginStatus,
+    upgradeUser,
+    sendAutomatedEmail
 } = require("../controllers/userController");
 const {protect, adminOnly, authorOnly} = require("../middleware/authMiddleware");
 
@@ -20,6 +29,8 @@ router.post('/upgradeUser', protect, adminOnly, upgradeUser)
 
 
 router.get('/loginStatus', loginStatus)
+
+router.post('/sendAutomatedEmail', protect, sendAutomatedEmail)
 
 
 module.exports = router

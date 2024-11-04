@@ -5,6 +5,7 @@ const {generateToken} = require("../utils");
 const parser = require('ua-parser-js');
 const {async} = require("nodemon");
 const jwt = require("jsonwebtoken");
+const sendEmail = require("../utils/sendEmail");
 
 // register user
 const registerUser = asyncHandler(async (req, res) => {
@@ -195,7 +196,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 const getUsers = asyncHandler(async (req, res) => {
     const users = await User.find().sort('-createdAt').select('-password');
 
-    if(!users){
+    if (!users) {
         res.status(500);
         throw new Error("Something went wrong");
     }
@@ -204,16 +205,16 @@ const getUsers = asyncHandler(async (req, res) => {
 })
 
 // get login Status
-const loginStatus = asyncHandler(async(req, res) =>{
+const loginStatus = asyncHandler(async (req, res) => {
     const token = req.cookies.token;
-    if(!token){
+    if (!token) {
         return res.json(false)
     }
 
     // Verify token
     const verified = jwt.verify(token, process.env.JWT_SECRET);
 
-    if(verified){
+    if (verified) {
         return res.json(true)
     }
 
@@ -221,12 +222,12 @@ const loginStatus = asyncHandler(async(req, res) =>{
 });
 
 // upgrade user
-const upgradeUser = asyncHandler(async(req, res) =>{
+const upgradeUser = asyncHandler(async (req, res) => {
     const {role, id} = req.body
 
     const user = await User.findById(id);
 
-    if(!user){
+    if (!user) {
         res.status(404)
         throw new Error('User not found');
     }
@@ -237,6 +238,43 @@ const upgradeUser = asyncHandler(async(req, res) =>{
     res.status(200).json({message: `User role updated to ${role}`})
 })
 
+
+// send automated emails
+const sendAutomatedEmail = asyncHandler(async (req, res) => {
+    const {subject, sendTo, replyTo, template, url} = req.body;
+
+    if (!subject || !sendTo || !replyTo || !template) {
+        res.status(500)
+        throw new Error('Missing email parameter');
+    }
+
+    const user = await User.findOne({email: sendTo})
+    if (!user) {
+        res.status(404)
+        throw new Error('User not found');
+    }
+
+    const sentFrom = process.env.EMAIL_USER
+    const name = user.name
+    const link = `${process.env.FRONTEND_URL}${url}`
+
+
+    try {
+        await sendEmail(
+            subject, sendTo, sentFrom, replyTo, template, name, link
+        )
+
+        res.status(200).json({message: 'Email sent'})
+
+    } catch (error) {
+        res.status(500)
+        console.log(error)
+        throw new Error('Email not sent, please try again');
+    }
+
+})
+
+
 module.exports = {
     registerUser,
     loginUser,
@@ -246,5 +284,6 @@ module.exports = {
     deleteUser,
     getUsers,
     loginStatus,
-    upgradeUser
+    upgradeUser,
+    sendAutomatedEmail
 }
