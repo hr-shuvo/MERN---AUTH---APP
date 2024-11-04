@@ -47,7 +47,7 @@ const adminOnly = asyncHandler(async (req, res, next) => {
 })
 
 const authorOnly = asyncHandler(async (req, res, next) => {
-    if (req.user && (req.user.role === 'author' || req.user.role === 'author')) {
+    if (req.user && (req.user.role === 'author' || req.user.role === 'admin')) {
         next()
     } else {
         res.status(401)

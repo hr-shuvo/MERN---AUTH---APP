@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs')
 const {generateToken} = require("../utils");
 const parser = require('ua-parser-js');
 const {async} = require("nodemon");
+const {response} = require("express");
 
 // register user
 const registerUser = asyncHandler(async (req, res) => {
@@ -190,11 +191,24 @@ const deleteUser = asyncHandler(async (req, res) => {
     res.status(200).json({message: 'User deleted successfully'})
 })
 
+// get user list
+const getUsers = asyncHandler(async (req, res) => {
+    const users = await User.find().sort('-createdAt').select('-password');
+
+    if(!users){
+        res.status(500);
+        throw new Error("Something went wrong");
+    }
+
+    res.status(200).json(users);
+})
+
 module.exports = {
     registerUser,
     loginUser,
     logoutUser,
     getUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    getUsers
 }
