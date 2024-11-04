@@ -1,6 +1,6 @@
 const express = require("express")
 const {
-    registerUser, loginUser, logoutUser, getUser, updateUser, deleteUser, getUsers, loginStatus
+    registerUser, loginUser, logoutUser, getUser, updateUser, deleteUser, getUsers, loginStatus, upgradeUser
 } = require("../controllers/userController");
 const {protect, adminOnly, authorOnly} = require("../middleware/authMiddleware");
 
@@ -16,6 +16,8 @@ router.patch('/updateUser', protect, updateUser)
 router.delete('/deleteUser/:id', protect, adminOnly, deleteUser)
 
 router.get('/getUsers', protect, authorOnly, getUsers)
+router.post('/upgradeUser', protect, adminOnly, upgradeUser)
+
 
 router.get('/loginStatus', loginStatus)
 
