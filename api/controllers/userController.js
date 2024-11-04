@@ -115,7 +115,7 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 // logout user
-const logoutUser = asyncHandler(async(req, res) =>{
+const logoutUser = asyncHandler(async (req, res) => {
     res.cookie('token', '', {
         path: '/',
         httpOnly: true,
@@ -128,25 +128,59 @@ const logoutUser = asyncHandler(async(req, res) =>{
 });
 
 // get user
-const getUser = asyncHandler(async(req, res) =>{
+const getUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
 
-    if(user){
+    if (user) {
         const {_id, name, email, phone, bio, photo, role, isVerified} = user
 
         res.status(200).json({
             _id, name, email, phone, bio, photo, role, isVerified
         });
 
-    }else{
+    } else {
         res.status(404)
         throw new Error('User not found');
     }
+})
+
+// update user
+const updateUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+        const {name, email, phone, bio, photo, role, isVerified} = user
+
+        user.email = email
+        user.name = req.body.name || name
+        user.phone = req.body.phone || phone
+        user.bio = req.body.bio || bio
+        user.photo = req.body.photo || photo
+
+        const updatedUser = await user.save()
+
+        res.status(200).json({
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            phone: updatedUser.phone,
+            bio: updatedUser.bio,
+            photo: updatedUser.photo,
+            role: updatedUser.role,
+            isVerified: updatedUser.isVerified
+        });
+
+    } else {
+        res.status(404)
+        throw new Error('User not found');
+    }
+
 })
 
 module.exports = {
     registerUser,
     loginUser,
     logoutUser,
-    getUser
+    getUser,
+    updateUser
 }
