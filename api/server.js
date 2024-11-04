@@ -1,10 +1,11 @@
-require("dotenv").config({path: '.env.example'})
+require("dotenv").config({path: '.env.example'});
 
 const express = require("express")
 const mongoose = require("mongoose")
 const cors = require("cors")
 const bodyParser = require("body-parser")
 const cookieParser = require("cookie-parser")
+const userRoute = require("./routes/userRoute")
 
 const app = express()
 
@@ -19,6 +20,9 @@ app.use(
         credentials: true
     })
 )
+
+// Routes
+app.use('/api/users', userRoute)
 
 
 app.get("/", (req, res) => {
