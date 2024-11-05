@@ -195,6 +195,11 @@ const sendLoginCode = asyncHandler(async (req, res) => {
 
 })
 
+// login with code
+const loginWithCOde = asyncHandler(async(req, res) =>{
+    res.send('login with code')
+})
+
 // logout user
 const logoutUser = asyncHandler(async (req, res) => {
     res.cookie('token', '', {
@@ -571,5 +576,6 @@ module.exports = {
     forgotPassword,
     resetPassword,
     changePassword,
-    sendLoginCode
+    sendLoginCode,
+    loginWithCOde
 }
