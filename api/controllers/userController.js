@@ -121,9 +121,8 @@ const loginUser = asyncHandler(async (req, res) => {
         }).save();
 
         res.status(400)
-        throw new Error('Check your email for login code')
+        throw new Error('New browser or device detected')
     }
-
 
     // Generate Token
     const token = generateToken(user._id);
@@ -196,9 +195,61 @@ const sendLoginCode = asyncHandler(async (req, res) => {
 })
 
 // login with code
-const loginWithCOde = asyncHandler(async(req, res) =>{
-    res.send('login with code')
-})
+const loginWithCOde = asyncHandler(async (req, res) => {
+    const {email} = req.params
+    const {loginCode} = req.body
+
+    const user = await User.findOne({email});
+    if (!user) {
+        res.status(404)
+        throw new Error('User not found');
+    }
+
+    // Find user login token
+    const userToken = await Token.findOne({userId: user._id, expiresAt: {$gt: Date.now()}})
+    if (!userToken) {
+        res.status(404)
+        throw new Error('Invalid or Expire token, please login again');
+    }
+
+    const decryptedLoginCode = cryptr.decrypt(userToken.lToken)
+
+    if (loginCode !== decryptedLoginCode) {
+        res.status(404)
+        throw new Error('Incorrect login code, please try again');
+    }else{
+
+
+        // Register user agent
+
+        const ua = parser(req.headers['user-agent']);
+        const thisUserAgent = ua.ua
+
+        const allowedAgent = user.userAgent.includes(thisUserAgent)
+        if(!allowedAgent){
+            user.userAgent.push(thisUserAgent);
+            await user.save()
+        }
+
+        const token = generateToken(user._id)
+
+        // Set HTTP_ONLY Cookie
+        res.cookie('token', token, {
+            path: '/',
+            httpOnly: true,
+            expires: new Date(Date.now() + 1000 * 86400), // 1 day
+            sameSite: 'none',
+            secure: true
+        })
+
+        const {_id, name, email, phone, bio, photo, role, isVerified} = user
+
+        res.status(201).json({
+            _id, name, email, phone, bio, photo, role, isVerified, token
+        });
+    }
+
+});
 
 // logout user
 const logoutUser = asyncHandler(async (req, res) => {
