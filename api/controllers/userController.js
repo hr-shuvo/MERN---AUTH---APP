@@ -8,6 +8,8 @@ const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/sendEmail");
 const Token = require("../models/tokenModel");
 const crypto = require('crypto')
+const Cryptr = require('cryptr');
+const cryptr = new Cryptr(process.env.CRYPTR_KEY);
 
 
 // register user
@@ -33,7 +35,6 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // Get UserAgent
     const ua = parser(req.headers['user-agent']);
-    // console.log(ua)
     const userAgent = [ua.ua]
 
     // Create new user
@@ -92,6 +93,37 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     // Trigger 2FA for unknown UserAgent
+    // Get UserAgent
+    const ua = parser(req.headers['user-agent']);
+    const thisUserAgent = ua.ua
+
+    const allowedAgent = user.userAgent.includes(thisUserAgent)
+    if (!allowedAgent) {
+        // Generate 6 digit code
+        const loginCode = Math.floor(100000 + Math.random() * 900000)
+        console.log(loginCode)
+
+        // Encrypt login code before saving to DB
+        const encryptedLoginCode = cryptr.encrypt(loginCode.toString())
+
+        let userToken = await Token.findOne({userId: user._id});
+        if (userToken) {
+            await userToken.deleteOne()
+        }
+
+        // Save token to DB
+
+        await new Token({
+            userId: user._id,
+            lToken: encryptedLoginCode,
+            createdAt: Date.now(),
+            expiresAt: Date.now() + 10 * (60 * 1000) // 10 minutes
+        }).save();
+
+        res.status(400)
+        throw new Error('Check your email for login code')
+    }
+
 
     // Generate Token
     const token = generateToken(user._id);
@@ -118,6 +150,50 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
 });
+
+// Send login code
+const sendLoginCode = asyncHandler(async (req, res) => {
+    const {email} = req.params
+
+    const user = await User.findOne({email})
+    if (!user) {
+        res.status(404)
+        throw new Error('User not found');
+    }
+
+    // Find login code in db
+    const userToken = await Token.findOne({userId: user._id, expiresAt: {$gt: Date.now()}})
+    if (!userToken) {
+        res.status(404)
+        throw new Error('Invalid or Expire token, please login again');
+    }
+
+    const loginCode = userToken.lToken;
+    const decryptedLoginCode = cryptr.decrypt(loginCode)
+
+    // Send Email - login code
+    const subject = `Login access code - ${process.env.ORG_NAME}`
+    const sendTo = email
+    const sendFrom = process.env.SMTP_EMAIL_USER
+    const replyTo = process.env.SMTP_EMAIL_NOREPLY
+    const template = 'loginCode'
+    const name = user.name
+    const link = decryptedLoginCode
+
+    try {
+        await sendEmail(
+            subject, sendTo, sendFrom, replyTo, template, name, link
+        )
+
+        res.status(200).json({message: `Access code sent to ${email}`})
+
+    } catch (error) {
+        res.status(500)
+        // console.log(error)
+        throw new Error('Email not sent, please try again');
+    }
+
+})
 
 // logout user
 const logoutUser = asyncHandler(async (req, res) => {
@@ -449,7 +525,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 
 })
 
-const changePassword = asyncHandler(async(req, res) =>{
+const changePassword = asyncHandler(async (req, res) => {
     const {oldPassword, password} = req.body;
 
     const user = await User.findById(req.user._id)
@@ -458,7 +534,7 @@ const changePassword = asyncHandler(async(req, res) =>{
         throw new Error('User not found');
     }
 
-    if(!oldPassword || !password){
+    if (!oldPassword || !password) {
         res.status(400)
         throw new Error('Please enter old and new password');
     }
@@ -466,13 +542,12 @@ const changePassword = asyncHandler(async(req, res) =>{
     // Check if old password is correct
     const passwordIsCorrect = await bcrypt.compare(oldPassword, user.password)
 
-    if(passwordIsCorrect){
+    if (passwordIsCorrect) {
         user.password = password
         await user.save()
 
         res.status(200).json({message: 'Password change successful, please re-login'})
-    }
-    else{
+    } else {
         res.status(400)
         throw new Error('Incorrect old password');
     }
@@ -495,5 +570,6 @@ module.exports = {
     verifyUser,
     forgotPassword,
     resetPassword,
-    changePassword
+    changePassword,
+    sendLoginCode
 }
