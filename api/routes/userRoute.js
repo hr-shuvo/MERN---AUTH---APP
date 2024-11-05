@@ -10,7 +10,8 @@ const {
     loginStatus,
     upgradeUser,
     sendAutomatedEmail,
-    sendVerificationEmail
+    sendVerificationEmail,
+    verifyUser
 } = require("../controllers/userController");
 const {protect, adminOnly, authorOnly} = require("../middleware/authMiddleware");
 
@@ -28,11 +29,12 @@ router.delete('/deleteUser/:id', protect, adminOnly, deleteUser)
 router.get('/getUsers', protect, authorOnly, getUsers)
 router.post('/upgradeUser', protect, adminOnly, upgradeUser)
 
-
 router.get('/loginStatus', loginStatus)
 
 router.post('/sendAutomatedEmail', protect, sendAutomatedEmail)
 router.post('/sendVerificationEmail', protect, sendVerificationEmail)
+
+router.post('/verifyUser/:verificationToken', verifyUser)
 
 
 module.exports = router

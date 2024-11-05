@@ -297,7 +297,7 @@ const sendVerificationEmail = asyncHandler(async (req, res) => {
 
     // create token and save
     const verificationToken = crypto.randomBytes(32).toString('hex') + user._id;
-    console.log(verificationToken)
+    console.log('verification token: ', verificationToken)
 
     // Hash token and save
     const hashedToken = hashToken(verificationToken)
@@ -326,16 +326,42 @@ const sendVerificationEmail = asyncHandler(async (req, res) => {
             subject, sendTo, sendFrom, replyTo, template, name, link
         )
 
-        res.status(200).json({message: 'Email sent'})
+        res.status(200).json({message: 'Verification Email sent'})
 
     } catch (error) {
         res.status(500)
-        console.log(error)
+        // console.log(error)
         throw new Error('Email not sent, please try again');
     }
 
+})
 
-    res.send("Token")
+// verify user
+const verifyUser = asyncHandler(async (req, res) => {
+    const {verificationToken} = req.params
+
+    const hashedToken = hashToken(verificationToken)
+
+    const userToken = await Token.findOne({vToken: hashedToken, expiresAt: {$gt: Date.now()}})
+
+    if(!userToken){
+        res.status(404)
+        throw new Error('Invalid or Expired Token');
+    }
+
+    // Find User
+    const user = await User.findOne({_id: userToken.userId})
+
+    if(user.isVerified){
+        res.status(400)
+        throw new Error('User already verified');
+    }
+
+    // Verify user
+    user.isVerified = true
+    await user.save()
+
+    res.status(200).json({message: 'Account verification successful'})
 })
 
 
@@ -350,5 +376,6 @@ module.exports = {
     loginStatus,
     upgradeUser,
     sendAutomatedEmail,
-    sendVerificationEmail
+    sendVerificationEmail,
+    verifyUser
 }
