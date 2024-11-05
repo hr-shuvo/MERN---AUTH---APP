@@ -12,7 +12,8 @@ const {
     sendAutomatedEmail,
     sendVerificationEmail,
     verifyUser,
-    forgotPassword
+    forgotPassword,
+    resetPassword
 } = require("../controllers/userController");
 const {protect, adminOnly, authorOnly} = require("../middleware/authMiddleware");
 
@@ -35,8 +36,9 @@ router.get('/loginStatus', loginStatus)
 router.post('/sendAutomatedEmail', protect, sendAutomatedEmail)
 router.post('/sendVerificationEmail', protect, sendVerificationEmail)
 
-router.post('/verifyUser/:verificationToken', verifyUser)
+router.patch('/verifyUser/:verificationToken', verifyUser)
 router.post('/forgotPassword', forgotPassword)
+router.patch('/resetPassword/:resetToken', resetPassword)
 
 
 module.exports = router
