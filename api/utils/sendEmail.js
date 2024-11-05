@@ -7,11 +7,11 @@ const sendEmail = async (subject, sendTo, sendFrom, replyTo, template, name, lin
 
     // Create Email Transporter
     const transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST_MAILJET,
+        host: process.env.SMTP_HOST_MAILJET,
         port: 587,
         auth: {
-            user: process.env.EMAIL_USER_MAILJET,
-            pass: process.env.EMAIL_PASS_MAILJET,
+            user: process.env.SMTP_USER_MAILJET,
+            pass: process.env.SMTP_PASS_MAILJET,
         },
         tls: {
             rejectUnauthorized: false
