@@ -344,7 +344,7 @@ const verifyUser = asyncHandler(async (req, res) => {
 
     const userToken = await Token.findOne({vToken: hashedToken, expiresAt: {$gt: Date.now()}})
 
-    if(!userToken){
+    if (!userToken) {
         res.status(404)
         throw new Error('Invalid or Expired Token');
     }
@@ -352,7 +352,7 @@ const verifyUser = asyncHandler(async (req, res) => {
     // Find User
     const user = await User.findOne({_id: userToken.userId})
 
-    if(user.isVerified){
+    if (user.isVerified) {
         res.status(400)
         throw new Error('User already verified');
     }
@@ -362,6 +362,62 @@ const verifyUser = asyncHandler(async (req, res) => {
     await user.save()
 
     res.status(200).json({message: 'Account verification successful'})
+})
+
+// forgot password
+const forgotPassword = asyncHandler(async (req, res) =>{
+    const {email} = req.body
+
+    const user = await User.findOne({email: email})
+    if (!user) {
+        res.status(404)
+        throw new Error('User not found');
+    }
+
+    let token = await Token.findOne({userId: user._id});
+    if (token) {
+        await token.deleteOne()
+    }
+
+    // create token and save
+    const resetToken = crypto.randomBytes(32).toString('hex') + user._id;
+    console.log('reset token: ', resetToken)
+
+    // Hash token and save
+    const hashedToken = hashToken(resetToken)
+
+    await new Token({
+        userId: user._id,
+        rToken: hashedToken,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 10 * (60 * 1000) // 10 minutes
+    }).save();
+
+    // construct reset url
+    const resetUrl = `${process.env.FRONTEND_URL}/resetPassword/${resetToken}`;
+
+    // Send Email
+    const subject = `Password Reset Request - ${process.env.ORG_NAME}`
+    const sendTo = user.email
+    const sendFrom = process.env.SMTP_EMAIL_USER
+    const replyTo = process.env.SMTP_EMAIL_NOREPLY
+    const template = 'forgotPassword'
+    const name = user.name
+    const link = resetUrl
+
+    try {
+        await sendEmail(
+            subject, sendTo, sendFrom, replyTo, template, name, link
+        )
+
+        res.status(200).json({message: 'Password Reset Email sent'})
+
+    } catch (error) {
+        res.status(500)
+        // console.log(error)
+        throw new Error('Email not sent, please try again');
+    }
+
 })
 
 
@@ -377,5 +433,6 @@ module.exports = {
     upgradeUser,
     sendAutomatedEmail,
     sendVerificationEmail,
-    verifyUser
+    verifyUser,
+    forgotPassword
 }

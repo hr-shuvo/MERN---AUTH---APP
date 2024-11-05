@@ -11,7 +11,8 @@ const {
     upgradeUser,
     sendAutomatedEmail,
     sendVerificationEmail,
-    verifyUser
+    verifyUser,
+    forgotPassword
 } = require("../controllers/userController");
 const {protect, adminOnly, authorOnly} = require("../middleware/authMiddleware");
 
@@ -35,6 +36,7 @@ router.post('/sendAutomatedEmail', protect, sendAutomatedEmail)
 router.post('/sendVerificationEmail', protect, sendVerificationEmail)
 
 router.post('/verifyUser/:verificationToken', verifyUser)
+router.post('/forgotPassword', forgotPassword)
 
 
 module.exports = router
