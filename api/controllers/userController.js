@@ -436,12 +436,46 @@ const resetPassword = asyncHandler(async (req, res) => {
 
     // Find User
     const user = await User.findOne({_id: userToken.userId})
+    if (!user) {
+        res.status(404)
+        throw new Error('User not found');
+    }
 
     // Verify user
     user.password = password
     await user.save()
 
     res.status(200).json({message: 'Password Reset successful, please login'})
+
+})
+
+const changePassword = asyncHandler(async(req, res) =>{
+    const {oldPassword, password} = req.body;
+
+    const user = await User.findById(req.user._id)
+    if (!user) {
+        res.status(404)
+        throw new Error('User not found');
+    }
+
+    if(!oldPassword || !password){
+        res.status(400)
+        throw new Error('Please enter old and new password');
+    }
+
+    // Check if old password is correct
+    const passwordIsCorrect = await bcrypt.compare(oldPassword, user.password)
+
+    if(passwordIsCorrect){
+        user.password = password
+        await user.save()
+
+        res.status(200).json({message: 'Password change successful, please re-login'})
+    }
+    else{
+        res.status(400)
+        throw new Error('Incorrect old password');
+    }
 
 })
 
@@ -460,5 +494,6 @@ module.exports = {
     sendVerificationEmail,
     verifyUser,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    changePassword
 }
