@@ -30,3 +30,5 @@ package-lock.json
 **/node_modules/
 
 api/.env.example
+
+client/.env.example
