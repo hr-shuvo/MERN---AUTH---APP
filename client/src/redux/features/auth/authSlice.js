@@ -3,15 +3,13 @@ import authService from "./authService";
 import { toast } from "react-toastify";
 
 const initialState = {
-  RESET(state) {
-    state.isLoggedIn = false;
-    state.user = null;
-    state.users = [];
-    state.twoFactor = false;
-    state.isError = false;
-    state.isLoading = false;
-    state.message = "";
-  },
+  isLoggedIn: false,
+  user: null,
+  users: [],
+  twoFactor: false,
+  isError: false,
+  isLoading: false,
+  message: "",
 };
 
 const authSlice = createSlice({
@@ -28,23 +26,24 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-    .addCase(register.pending, (state, action) => {
+      .addCase(register.pending, (state, action) => {
         state.isLoading = true;
-    })
-    .addCase(register.fulfilled, (state, action) =>{
+      })
+      .addCase(register.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.isLoggedIn = true;
         state.user = action.payload;
-        toast.success('Registration successful')
-    })
-    .addCase(register.rejected, (state, action) =>{
+        console.log(action.payload);
+        toast.success("Registration successful");
+      })
+      .addCase(register.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
         state.user = null;
         toast.error(action.payload);
-    });
+      });
   },
 });
 

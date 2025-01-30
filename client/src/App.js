@@ -13,6 +13,8 @@ import UserList from "./pages/userList/UserList";
 import Loader from "./components/loader/Loader";
 import axios from "axios";
 import {ToastContainer} from "react-toastify";
+import 'react-toastify/ReactToastify.css'
+
 
 axios.defaults.withCredentials = true;
 
