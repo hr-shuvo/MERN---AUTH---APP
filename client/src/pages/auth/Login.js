@@ -1,20 +1,67 @@
 import styles from './auth.module.scss'
 import Card from "../../components/card/Card";
 import {BiLogIn} from "react-icons/bi";
-import {useState} from "react";
-import {Link} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {Link, useNavigate} from "react-router-dom";
 import PasswordInput from "../../components/passwordInput/PasswordInput";
+import { useSelector, useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
+import { login, RESET } from '../../redux/features/auth/authSlice';
+import Loader from '../../components/loader/Loader';
+
+const initialState = {
+    email: '',
+    password: ''
+}
 
 const Login = () => {
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const handleInputChange = () => {
+    const [ fromData, setFromData] = useState(initialState);
+    const { email, password } = fromData;
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const {isLoading, isLoggedIn, isSuccess, message} = useSelector((state) => state.auth);
+
+    const handleInputChange = (e) => {
+        const {name, value} = e.target
+
+        setFromData({...fromData, [name]: value});
+    };
+
+
+    const loginUser = async (e) => {
+        e.preventDefault()
+        
+        if(!email || !password){
+            return toast.error('All field are required');
+        }
+
+        if(!email){
+            return toast.error('Invalid email');
+        }
+
+        const userData = {
+            email, password
+        }
+
+        console.log(userData);
+
+        await dispatch(login(userData));
     }
-    const loginUser = () => {
-    }
+
+    useEffect(() =>{
+            if(isSuccess && isLoggedIn){
+                navigate('/profile');     
+            }
+    
+            dispatch(RESET());
+        }, [isLoggedIn, isSuccess, dispatch, navigate])
 
     return (
         <div className={`container ${styles.auth}`}>
+            {isLoading && <Loader/>}
+
             <Card cardClass={''}>
                 <div className={styles.form}>
                     <div className='--flex-center'>
@@ -32,8 +79,9 @@ const Login = () => {
                     <form onSubmit={loginUser}>
                         <input type={"email"}
                                value={email}
+                               name={'email'}
                                placeholder={"Email"}
-                               required={true}
+                               required
                                onChange={handleInputChange}
                         />
 
@@ -41,7 +89,7 @@ const Login = () => {
                             placeholder={'Password'}
                             name={'password'}
                             value={password}
-                            onChange={handleInputChange()}
+                            onChange={handleInputChange}
 
                         ></PasswordInput>
 
