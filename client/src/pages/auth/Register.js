@@ -115,8 +115,6 @@ const Register = () => {
         dispatch(RESET());
     }, [isLoggedIn, isSuccess, dispatch, navigate])
 
-    const loginUser = () => {
-    }
 
     return (<div className={`container ${styles.auth}`}>
 

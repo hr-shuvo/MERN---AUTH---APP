@@ -76,7 +76,7 @@ const authSlice = createSlice({
         state.isLoggedIn = false;
         state.user = null;
         console.log(action.payload);
-        toast.success(action.payload);
+        toast.success(action.payload.message);
       })
       .addCase(logout.rejected, (state, action) => {
         state.isLoading = false;
@@ -126,7 +126,7 @@ export const logout = createAsyncThunk(
   "auth/logout",
   async (thunkAPI) => {
     try {
-      return await authService.login();
+      return await authService.logout();
     } catch (err) {
       const message =
         (err.response && err.response.data && err.response.data.message) ||

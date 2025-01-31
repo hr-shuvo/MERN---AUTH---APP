@@ -2,13 +2,25 @@ import "./Header.scss"
 import {IoLogInOutline} from "react-icons/io5";
 import {FaUserCircle} from "react-icons/fa";
 import {Link, NavLink, useNavigate} from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logout, RESET } from "../../redux/features/auth/authSlice";
 
 const activeLink = ({isActive}) => (isActive ? 'active' : '')
 
 const Header = () => {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const goHome = () =>{
+        navigate('/')
+    }
+
+    const logoutUser = async () =>{
+
+        dispatch(RESET());
+
+        await dispatch(logout());    
+        
         navigate('/')
     }
 
@@ -39,7 +51,7 @@ const Header = () => {
                     </li>
 
                     <li>
-                        <button className='--btn --btn-secondary'>
+                        <button className='--btn --btn-secondary' onClick={logoutUser}>
                             Logout
                         </button>
                     </li>
